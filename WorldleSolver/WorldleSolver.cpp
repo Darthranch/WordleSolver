@@ -16,7 +16,12 @@
 
 #define NUM_LETTERS 5
 
+//#define TESTING 0
+#define TESTING 1
+
+#if TESTING
 std::string g_solution;
+#endif
 
 typedef std::set<std::string> BigMapType;
 typedef std::map<char, int> CharCountType;
@@ -81,6 +86,7 @@ int totalCharCount(CharCountType& p_charCount) {
     return retVal;
 }
 
+#if TESTING
 void applyGuess(std::string& p_guess, char p_result[NUM_LETTERS]) {  //farts   troll, t_result = "**___"
     CharCountType t_analyze;
     for (int i = 0; i < NUM_LETTERS; ++i) {
@@ -123,6 +129,7 @@ void applyGuess(std::string& p_guess, char p_result[NUM_LETTERS]) {  //farts   t
         }
     }
 }
+#endif
 
 void addToAllowed(int p_index,
     char p_char,
@@ -311,14 +318,21 @@ std::string guessWord(BigMapType& p_bigMap,
 
 int main(int argC, const char** argv)
 {
-    if (argC != 3) {
-        std::cout << "instructions" << std::endl;
+#if !TESTING
+    if (argC != 2) {
+        std::cout << "Instructions: Pass in dictionary. <english3.txt>" << std::endl;
         return 0;
     }
-    std::cout << argv[1] << std::endl;
-    std::string caseProblem(argv[1]);
+#else
+    if (argC != 3) {
+        std::cout << "Testing instructions: Pass in dictionary then solution. i.e. <english3.txt fails> " << std::endl;
+        return 0;
+    }
     g_solution = argv[2];
     std::transform(g_solution.begin(), g_solution.end(), g_solution.begin(), ::toupper);
+#endif
+    std::cout << argv[1] << std::endl;
+    std::string caseProblem(argv[1]);
 
     BigMapType t_bigMap;
     getWords(caseProblem, t_bigMap);
@@ -341,7 +355,9 @@ int main(int argC, const char** argv)
         }
         std::cout << t_guess << std::endl;
 
-        char t_result[NUM_LETTERS];
+        char t_result[NUM_LETTERS + 1];
+        t_result[NUM_LETTERS] = 0;
+#if !TESTING
         std::string t_resultString;
         while (t_resultString.length() != NUM_LETTERS) {
             std::cin >> t_resultString;
@@ -353,7 +369,10 @@ int main(int argC, const char** argv)
         for (int i = 0; i < NUM_LETTERS; i++) {
             t_result[i] = t_resultString[i];
         }
-        //applyGuess(t_guess, t_result); //farts   troll, t_result = "**___"
+#else
+        applyGuess(t_guess, t_result); //farts   troll, t_result = "**___"
+        std::cout << t_result << std::endl;
+#endif
         CharCountType t_wordAllowed;
         fillWorkingData(t_guess, t_result, t_wordAllowed, t_maximum, t_eliminatedBuckets, t_solution);
         for (auto t_wordIter : t_wordAllowed) {
